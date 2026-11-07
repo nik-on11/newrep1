@@ -1,0 +1,43 @@
+name: Update schedule
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-schedule
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install libraries
+        run: pip install requests beautifulsoup4
+
+      - name: Put previous data next to the parser
+        run: cp site/schedules.json tools/schedules.json || true
+
+      - name: Run parser
+        run: python tools/parser.py
+
+      - name: Copy result to the site folder
+        run: cp tools/schedules.json site/schedules.json
+
+      - name: Commit only if changed
+        run: |
+          git config user.name "schedule-bot"
+          git config user.email "actions@github.com"
+          git add site/schedules.json
+          git diff --cached --quiet || (git commit -m "Update schedule" && git push)
