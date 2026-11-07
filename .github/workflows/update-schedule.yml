@@ -2,7 +2,7 @@ name: Update schedule
 
 on:
   schedule:
-    - cron: "0 3 * * 1"
+    - cron: "0 21 * * 6"   # суббота 21:00 UTC = воскресенье 00:00 по Минску
   workflow_dispatch:
 
 permissions:
@@ -27,7 +27,14 @@ jobs:
         run: pip install requests beautifulsoup4
 
       - name: Run parser
-        run: python parser.py
+        run: |
+          if [ -f tools/parser.py ]; then DIR=tools
+          elif [ -f parser.py ]; then DIR=.
+          else echo "parser.py not found"; ls -la; exit 1
+          fi
+          [ "$DIR" = "." ] || cp schedules.json "$DIR/schedules.json" 2>/dev/null || true
+          python "$DIR/parser.py"
+          [ "$DIR" = "." ] || cp "$DIR/schedules.json" schedules.json
 
       - name: Commit only if changed
         run: |
