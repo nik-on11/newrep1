@@ -1,6 +1,6 @@
 // sw.js — Service Worker: хранит сайт и расписание в памяти телефона, чтобы всё открывалось без интернета.
 // ВАЖНО: при изменении иконок или манифеста увеличьте VERSION — тогда браузер обновит кэш.
-const VERSION = "v1";
+const VERSION = "v2";
 const CACHE = `schedule-${VERSION}`;
 const SHELL = ["./", "index.html", "manifest.json", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png"];
 
